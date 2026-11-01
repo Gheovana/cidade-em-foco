@@ -14,4 +14,14 @@ export class Api {
   listarOcorrencias(): Observable<Solicitacao[]> {
     return this.http.get<Solicitacao[]>(`${this.base}/ocorrencias`);
   }
+
+  // Recebe um FormData (campos + arquivo da foto).
+  criarOcorrencia(dados: FormData): Observable<Solicitacao> {
+    return this.http.post<Solicitacao>(`${this.base}/ocorrencias`, dados);
+  }
+
+  // Monta o endereço completo de uma foto guardada no backend.
+  urlFoto(nome: string): string {
+    return `${this.base}/uploads/${nome}`;
+  }
 }

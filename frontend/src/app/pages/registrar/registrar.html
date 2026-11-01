@@ -43,5 +43,6 @@
     <p class="aviso" [class.erro]="erro()">{{ mensagem() }}</p>
   }
 
-  <button class="botao enviar" type="submit">Enviar solicitação</button>
-</form>
+    <button class="botao enviar" type="submit" [disabled]="enviando()">
+    {{ enviando() ? 'Enviando...' : 'Enviar solicitação' }}
+  </button>

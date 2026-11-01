@@ -23,7 +23,7 @@
       <article class="item cartao">
         <div class="foto">
           @if (s.foto) {
-            <img [src]="s.foto" [alt]="s.titulo" />
+                        <img [src]="api.urlFoto(s.foto)" [alt]="s.titulo" />
           } @else {
             <span>📷</span>
           }

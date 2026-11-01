@@ -48,7 +48,7 @@ export class MinhasSolicitacoes implements OnInit {
     return filtro === 'todas' ? todas : todas.filter((s) => s.status === filtro);
   });
 
-  constructor(private api: Api) {}
+    constructor(public api: Api) {}
 
   // Roda uma vez, quando a página abre: busca as ocorrências na API.
   ngOnInit() {
