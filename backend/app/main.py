@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.staticfiles import StaticFiles
+
+from app.config import PASTA_UPLOADS
+
 from app import models
 from app.database import engine
 from app.routers import ocorrencias, usuarios
@@ -30,6 +34,9 @@ app.add_middleware(
 app.include_router(usuarios.router)
 app.include_router(ocorrencias.router)
 app.include_router(auth.router)
+
+# Disponibiliza as fotos em /uploads/<nome-do-arquivo>.
+app.mount("/uploads", StaticFiles(directory=PASTA_UPLOADS), name="uploads")
 
 # Rota raiz: responde quando alguém acessa o endereço principal da API.
 @app.get("/")

@@ -1,32 +1,100 @@
-from fastapi import APIRouter, Depends, HTTPException
+import uuid
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
+from app.config import PASTA_UPLOADS, TAMANHO_MAXIMO_MB
 from app.database import obter_sessao
 from app.dependencias import apenas_admin, usuario_logado
 from app.models import HistoricoStatus, Ocorrencia, Usuario
-from app.schemas import OcorrenciaCriar, OcorrenciaResposta, StatusAlterar
+from app.schemas import Categoria, OcorrenciaResposta, StatusAlterar
 
 router = APIRouter(prefix="/ocorrencias", tags=["Ocorrências"])
+
+NOMES_CATEGORIA = {
+    "buraco": "Buraco na via",
+    "iluminacao": "Iluminação pública",
+    "lixo": "Lixo acumulado",
+    "vazamento": "Vazamento",
+    "outros": "Outros",
+}
+
+
+def detectar_tipo_imagem(inicio: bytes) -> str | None:
+    """Descobre o tipo real da imagem pelos primeiros bytes do arquivo.
+    Não confiamos no nome nem no tipo informado pelo usuário, que podem mentir."""
+    if inicio.startswith(b"\xff\xd8\xff"):
+        return ".jpg"
+    if inicio.startswith(b"\x89PNG\r\n\x1a\n"):
+        return ".png"
+    if inicio[:4] == b"RIFF" and inicio[8:12] == b"WEBP":
+        return ".webp"
+    return None
+
+
+def salvar_foto(foto: UploadFile) -> str:
+    """Valida e guarda a foto. Devolve o nome do arquivo salvo."""
+    limite = TAMANHO_MAXIMO_MB * 1024 * 1024
+    conteudo = foto.file.read(limite + 1)  # lê um byte a mais só para detectar excesso
+
+    if len(conteudo) > limite:
+        raise HTTPException(status_code=413, detail=f"A foto deve ter no máximo {TAMANHO_MAXIMO_MB} MB.")
+
+    extensao = detectar_tipo_imagem(conteudo[:12])
+    if extensao is None:
+        raise HTTPException(status_code=422, detail="O arquivo enviado não é uma imagem JPG, PNG ou WEBP.")
+
+    # Nome aleatório: ignora o nome original, que poderia conter caminhos ou códigos.
+    nome = f"{uuid.uuid4().hex}{extensao}"
+    (PASTA_UPLOADS / nome).write_bytes(conteudo)
+    return nome
 
 
 @router.post("", response_model=OcorrenciaResposta, status_code=201)
 def criar_ocorrencia(
-    dados: OcorrenciaCriar,
+    categoria: Categoria = Form(),
+    descricao: str | None = Form(default=None, max_length=2000),
+    regiao: str | None = Form(default=None, max_length=100),
+    latitude: float | None = Form(default=None, ge=-90, le=90),
+    longitude: float | None = Form(default=None, ge=-180, le=180),
+    foto: UploadFile | None = File(default=None),
     sessao: Session = Depends(obter_sessao),
     usuario: Usuario = Depends(usuario_logado),
 ):
+    regiao = regiao.strip() if regiao else None
+    descricao = descricao.strip() if descricao else None
+
+    # Latitude e longitude andam juntas.
+    if (latitude is None) != (longitude is None):
+        raise HTTPException(status_code=422, detail="Informe latitude e longitude juntas.")
+
+    # É preciso saber onde fica o problema.
+    if not regiao and latitude is None:
+        raise HTTPException(status_code=422, detail="Informe a localização do problema.")
+
+    nome_foto = salvar_foto(foto) if foto and foto.filename else None
+
     ocorrencia = Ocorrencia(
-        titulo=dados.titulo.strip(),
-        descricao=dados.descricao,
-        categoria=dados.categoria,
-        latitude=dados.latitude,
-        longitude=dados.longitude,
-        regiao=dados.regiao,
+        titulo=NOMES_CATEGORIA[categoria],
+        descricao=descricao,
+        categoria=categoria,
+        foto=nome_foto,
+        latitude=latitude,
+        longitude=longitude,
+        regiao=regiao,
         usuario_id=usuario.id,  # vem do login, nunca do formulário
         status="aberto",
     )
-    sessao.add(ocorrencia)
-    sessao.commit()
+    try:
+        sessao.add(ocorrencia)
+        sessao.commit()
+    except Exception:
+        # Se o banco falhar, não deixa uma foto órfã no disco.
+        sessao.rollback()
+        if nome_foto:
+            (PASTA_UPLOADS / nome_foto).unlink(missing_ok=True)
+        raise HTTPException(status_code=500, detail="Não foi possível salvar a ocorrência.")
+
     sessao.refresh(ocorrencia)
     return ocorrencia
 
@@ -50,8 +118,6 @@ def buscar_ocorrencia(
     usuario: Usuario = Depends(usuario_logado),
 ):
     ocorrencia = sessao.get(Ocorrencia, ocorrencia_id)
-    # Se não for dono (e não for admin), responde "não encontrada":
-    # assim ninguém descobre quais ids existem.
     if not ocorrencia or (usuario.tipo != "admin" and ocorrencia.usuario_id != usuario.id):
         raise HTTPException(status_code=404, detail="Ocorrência não encontrada.")
     return ocorrencia
