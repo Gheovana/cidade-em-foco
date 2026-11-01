@@ -1,0 +1,63 @@
+.totais {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.total strong {
+  display: block;
+  font-size: 2.2rem;
+  color: var(--azul);
+}
+
+.total span {
+  color: var(--texto-suave);
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.nome {
+  width: 130px;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.trilho {
+  flex: 1;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--azul-claro);
+  overflow: hidden;
+}
+
+.barra {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--azul);
+}
+
+.prioridades {
+  margin: 0;
+  padding-left: 22px;
+  line-height: 1.9;
+}
+
+@media (max-width: 800px) {
+  .totais,
+  .grade {
+    grid-template-columns: 1fr;
+  }
+}

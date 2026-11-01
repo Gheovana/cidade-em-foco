@@ -1,3 +1,5 @@
+@import 'leaflet/dist/leaflet.css';
+
 /* Cores e medidas usadas em todo o site.
    Para mudar o tema, basta alterar aqui. */
 :root {
@@ -113,4 +115,25 @@ label {
   text-align: center;
   padding: 24px 12px;
   margin: 0;
+}
+
+/* ---------- Marcadores do mapa ---------- */
+.marcador {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.marcador-aberto {
+  background: #1565d8;
+}
+
+.marcador-em_andamento {
+  background: #f5b301;
+}
+
+.marcador-resolvido {
+  background: #2e9e5b;
 }

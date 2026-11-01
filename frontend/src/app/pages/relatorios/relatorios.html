@@ -1,1 +1,62 @@
-<p>relatorios works!</p>
+<h1 class="titulo-pagina">Relatórios e Indicadores</h1>
+<p class="subtitulo-pagina">Resumo das ocorrências registradas no sistema.</p>
+
+<section class="totais">
+  <div class="cartao total">
+    <strong>{{ totalAbertas() }}</strong>
+    <span>Total de abertas</span>
+  </div>
+  <div class="cartao total">
+    <strong>{{ totalResolvidas() }}</strong>
+    <span>Total de resolvidas</span>
+  </div>
+</section>
+
+<section class="grade">
+  <div class="cartao">
+    <h2>Ocorrências por tipo</h2>
+    @if (porTipo().length === 0) {
+      <p class="vazio">Sem dados para exibir.</p>
+    } @else {
+      @for (item of porTipo(); track item.nome) {
+        <div class="linha">
+          <span class="nome">{{ item.nome }}</span>
+          <div class="trilho">
+            <div class="barra" [style.width.%]="percentual(item.total, maxTipo())"></div>
+          </div>
+          <strong>{{ item.total }}</strong>
+        </div>
+      }
+    }
+  </div>
+
+  <div class="cartao">
+    <h2>Ocorrências por região</h2>
+    @if (porRegiao().length === 0) {
+      <p class="vazio">Sem dados para exibir.</p>
+    } @else {
+      @for (item of porRegiao(); track item.nome) {
+        <div class="linha">
+          <span class="nome">{{ item.nome }}</span>
+          <div class="trilho">
+            <div class="barra" [style.width.%]="percentual(item.total, maxRegiao())"></div>
+          </div>
+          <strong>{{ item.total }}</strong>
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<section class="cartao">
+  <h2>📍 Regiões com maior concentração de problemas</h2>
+  @if (regioesPrioritarias().length === 0) {
+    <p class="vazio">Sem dados para exibir.</p>
+  } @else {
+    <ol class="prioridades">
+      @for (item of regioesPrioritarias(); track item.nome) {
+        <li>{{ item.nome }} <strong>({{ item.total }})</strong></li>
+      }
+    </ol>
+  }
+</section>
