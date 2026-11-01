@@ -1,0 +1,57 @@
+<div class="tela">
+  <section class="lado-marca">
+    <div class="marca">
+      <div class="marca-icone">📍</div>
+      <h1>Cidade<br />em Foco</h1>
+      <p>Denúncias de problemas urbanos<br />por uma cidade melhor!</p>
+    </div>
+  </section>
+
+  <section class="lado-form">
+    <div class="caixa">
+      <div class="abas">
+        <button type="button" [class.ativa]="aba === 'entrar'" (click)="mudarAba('entrar')">
+          Entrar
+        </button>
+        <button type="button" [class.ativa]="aba === 'cadastrar'" (click)="mudarAba('cadastrar')">
+          Cadastrar
+        </button>
+      </div>
+
+      @if (aba === 'entrar') {
+        <h2>Bem-vindo(a)!</h2>
+        <p class="subtitulo">Faça login para acompanhar suas solicitações.</p>
+
+        <label for="email">E-mail</label>
+        <input id="email" type="email" placeholder="Seu e-mail" />
+
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" placeholder="Sua senha" />
+
+        <button class="botao largo" type="button" (click)="entrar()">Entrar</button>
+        <p class="rodape">
+          Não tem conta?
+          <a href="#" (click)="mudarAba('cadastrar'); $event.preventDefault()">Cadastre-se</a>
+        </p>
+      } @else {
+        <h2>Criar conta</h2>
+        <p class="subtitulo">Preencha os dados para começar a usar.</p>
+
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" placeholder="Seu nome" />
+
+        <label for="email-cad">E-mail</label>
+        <input id="email-cad" type="email" placeholder="Seu e-mail" />
+
+        <label for="senha-cad">Senha</label>
+        <input id="senha-cad" type="password" placeholder="Mínimo de 6 caracteres" />
+
+        <button class="botao largo" type="button">Cadastrar</button>
+        <p class="rodape">
+          Já tem conta?
+          <a href="#" (click)="mudarAba('entrar'); $event.preventDefault()">Entrar</a>
+        </p>
+      }
+    </div>
+  </section>
+</div>

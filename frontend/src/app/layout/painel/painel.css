@@ -1,0 +1,126 @@
+.estrutura {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Menu lateral ---------- */
+.menu {
+  width: 250px;
+  flex-shrink: 0;
+  background: var(--azul-marinho);
+  color: var(--branco);
+  padding: 24px 14px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.logo-icone {
+  font-size: 2rem;
+}
+
+.logo-texto {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.links a {
+  color: #cfd9ee;
+  text-decoration: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.links a:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Link da página em que o usuário está */
+.links a.ativo {
+  background: var(--azul);
+  color: var(--branco);
+  font-weight: 600;
+}
+
+.sair {
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cfd9ee;
+  text-align: left;
+  padding: 16px 14px 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.sair:hover {
+  color: var(--branco);
+}
+
+/* ---------- Área de conteúdo ---------- */
+.conteudo {
+  flex: 1;
+  min-width: 0;
+  padding: 28px;
+}
+
+/* ---------- Celular: o menu vira uma barra no topo ---------- */
+@media (max-width: 800px) {
+  .estrutura {
+    flex-direction: column;
+  }
+
+  .menu {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 12px;
+  }
+
+  .logo {
+    margin-bottom: 10px;
+  }
+
+  .logo-icone {
+    display: none;
+  }
+
+  .logo-texto br {
+    display: none;
+  }
+
+  .links {
+    flex-direction: row;
+    overflow-x: auto;
+    flex: none;
+  }
+
+  .links a {
+    white-space: nowrap;
+  }
+
+  .sair {
+    border-top: none;
+    padding: 10px 14px 0;
+  }
+
+  .conteudo {
+    padding: 16px;
+  }
+}

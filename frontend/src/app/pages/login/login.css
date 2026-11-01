@@ -1,0 +1,116 @@
+.tela {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Lado esquerdo: identidade visual ---------- */
+.lado-marca {
+  flex: 1;
+  background: linear-gradient(160deg, var(--azul-marinho), #1b3b78);
+  color: var(--branco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.marca-icone {
+  font-size: 4rem;
+}
+
+.marca h1 {
+  font-size: 3rem;
+  line-height: 1.05;
+  margin: 10px 0 18px;
+}
+
+.marca p {
+  font-size: 1.1rem;
+  color: #cfd9ee;
+}
+
+/* ---------- Lado direito: formulário ---------- */
+.lado-form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--branco);
+}
+
+.caixa {
+  width: 100%;
+  max-width: 400px;
+}
+
+.abas {
+  display: flex;
+  border-bottom: 1px solid var(--borda);
+  margin-bottom: 24px;
+}
+
+.abas button {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 12px;
+  font-size: 1rem;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.abas button.ativa {
+  color: var(--azul);
+  border-bottom-color: var(--azul);
+  font-weight: 600;
+}
+
+.caixa h2 {
+  text-align: center;
+  font-size: 1.7rem;
+}
+
+.subtitulo {
+  text-align: center;
+  color: var(--texto-suave);
+  margin: 0 0 12px;
+}
+
+.largo {
+  width: 100%;
+  margin-top: 22px;
+}
+
+.rodape {
+  text-align: center;
+  color: var(--texto-suave);
+  margin-top: 18px;
+}
+
+.rodape a {
+  color: var(--azul);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ---------- Celular: as duas partes ficam uma sobre a outra ---------- */
+@media (max-width: 800px) {
+  .tela {
+    flex-direction: column;
+  }
+
+  .lado-marca {
+    padding: 28px 16px;
+  }
+
+  .marca h1 {
+    font-size: 2rem;
+  }
+
+  .marca-icone {
+    font-size: 2.5rem;
+  }
+}
