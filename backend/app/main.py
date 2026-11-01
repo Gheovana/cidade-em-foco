@@ -1,5 +1,11 @@
 from fastapi import FastAPI
 
+from app import models
+from app.database import engine
+
+# Cria no banco todas as tabelas definidas em models.py (se ainda não existirem).
+models.Base.metadata.create_all(bind=engine)
+
 # Cria a aplicação. Este objeto "app" é a nossa API.
 app = FastAPI(
     title="Cidade em Foco - API",

@@ -1,0 +1,22 @@
+# --- Python ---
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# --- Banco de dados local e fotos enviadas ---
+*.db
+*.sqlite3
+backend/uploads/
+
+# --- Segredos e configurações locais ---
+.env
+
+# --- Angular / Node ---
+node_modules/
+dist/
+.angular/
+
+# --- Sistema e editor ---
+.DS_Store
+Thumbs.db
