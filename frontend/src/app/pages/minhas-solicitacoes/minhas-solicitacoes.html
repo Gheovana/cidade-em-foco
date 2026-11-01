@@ -1,6 +1,10 @@
 <h1 class="titulo-pagina">Minhas Solicitações</h1>
 <p class="subtitulo-pagina">Acompanhe o andamento das suas denúncias.</p>
 
+@if (erro()) {
+  <p class="aviso-erro">{{ erro() }}</p>
+}
+
 <div class="filtros">
   @for (f of filtros; track f.valor) {
     <button type="button" [class.ativo]="filtroAtual() === f.valor" (click)="escolher(f.valor)">

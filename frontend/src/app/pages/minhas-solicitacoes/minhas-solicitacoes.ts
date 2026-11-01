@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 
+import { Api } from '../../api';
 import { Solicitacao } from '../../models';
 
 type Filtro = 'todas' | 'aberto' | 'em_andamento' | 'resolvido';
@@ -11,7 +12,8 @@ type Filtro = 'todas' | 'aberto' | 'em_andamento' | 'resolvido';
   templateUrl: './minhas-solicitacoes.html',
   styleUrl: './minhas-solicitacoes.css',
 })
-export class MinhasSolicitacoes {
+export class MinhasSolicitacoes implements OnInit {
+  // Botões de filtro que aparecem no topo da página.
   filtros: { valor: Filtro; nome: string }[] = [
     { valor: 'todas', nome: 'Todas' },
     { valor: 'aberto', nome: 'Abertas' },
@@ -19,12 +21,14 @@ export class MinhasSolicitacoes {
     { valor: 'resolvido', nome: 'Resolvidas' },
   ];
 
+  // Textos exibidos para cada status.
   rotulosStatus: Record<string, string> = {
     aberto: 'Aberta',
     em_andamento: 'Em andamento',
     resolvido: 'Resolvida',
   };
 
+  // Nomes amigáveis para cada categoria.
   nomesCategoria: Record<string, string> = {
     buraco: 'Buraco na via',
     iluminacao: 'Iluminação pública',
@@ -34,16 +38,25 @@ export class MinhasSolicitacoes {
   };
 
   filtroAtual = signal<Filtro>('todas');
-
-  // Vazia por enquanto. Na Etapa 9 será preenchida com os dados da API.
   solicitacoes = signal<Solicitacao[]>([]);
+  erro = signal('');
 
-  // "computed" recalcula sozinho quando o filtro ou a lista mudam.
+  // Recalcula sozinho quando o filtro ou a lista mudam.
   visiveis = computed(() => {
     const filtro = this.filtroAtual();
     const todas = this.solicitacoes();
     return filtro === 'todas' ? todas : todas.filter((s) => s.status === filtro);
   });
+
+  constructor(private api: Api) {}
+
+  // Roda uma vez, quando a página abre: busca as ocorrências na API.
+  ngOnInit() {
+    this.api.listarOcorrencias().subscribe({
+      next: (lista) => this.solicitacoes.set(lista),
+      error: () => this.erro.set('Não foi possível carregar as solicitações.'),
+    });
+  }
 
   escolher(filtro: Filtro) {
     this.filtroAtual.set(filtro);

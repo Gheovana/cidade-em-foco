@@ -137,3 +137,11 @@ label {
 .marcador-resolvido {
   background: #2e9e5b;
 }
+
+.aviso-erro {
+  background: #fbe3e3;
+  color: #9b2c2c;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin: 0 0 16px;
+}

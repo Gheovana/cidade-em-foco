@@ -1,6 +1,10 @@
 <h1 class="titulo-pagina">Olá!</h1>
 <p class="subtitulo-pagina">Veja o resumo das solicitações da sua cidade.</p>
 
+@if (erro()) {
+  <p class="aviso-erro">{{ erro() }}</p>
+}
+
 <section class="indicadores">
   <div class="indicador abertas">
     <span class="icone">⚠️</span>
