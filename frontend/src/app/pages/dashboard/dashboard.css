@@ -1,0 +1,73 @@
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.indicador {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--raio);
+}
+
+.indicador .icone {
+  font-size: 2rem;
+}
+
+.indicador strong {
+  display: block;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.indicador span {
+  color: var(--texto-suave);
+}
+
+.abertas {
+  background: #e3eefc;
+}
+
+.andamento {
+  background: #fdf1cf;
+}
+
+.resolvidas {
+  background: #dff3e6;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.lista-regioes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lista-regioes li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (max-width: 800px) {
+  .indicadores,
+  .grade {
+    grid-template-columns: 1fr;
+  }
+}

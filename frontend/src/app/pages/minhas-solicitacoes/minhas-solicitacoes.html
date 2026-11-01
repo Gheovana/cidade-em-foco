@@ -1,1 +1,38 @@
-<p>minhas-solicitacoes works!</p>
+<h1 class="titulo-pagina">Minhas Solicitações</h1>
+<p class="subtitulo-pagina">Acompanhe o andamento das suas denúncias.</p>
+
+<div class="filtros">
+  @for (f of filtros; track f.valor) {
+    <button type="button" [class.ativo]="filtroAtual() === f.valor" (click)="escolher(f.valor)">
+      {{ f.nome }}
+    </button>
+  }
+</div>
+
+@if (visiveis().length === 0) {
+  <div class="cartao">
+    <p class="vazio">Nenhuma solicitação encontrada.</p>
+  </div>
+} @else {
+  <div class="lista">
+    @for (s of visiveis(); track s.id) {
+      <article class="item cartao">
+        <div class="foto">
+          @if (s.foto) {
+            <img [src]="s.foto" [alt]="s.titulo" />
+          } @else {
+            <span>📷</span>
+          }
+        </div>
+
+        <div class="info">
+          <h3>{{ nomesCategoria[s.categoria] || s.titulo }}</h3>
+          <p>📍 {{ s.regiao || 'Local não informado' }}</p>
+          <p>🗓️ {{ s.criado_em | date: 'dd/MM/yyyy' }}</p>
+        </div>
+
+        <span class="status" [attr.data-status]="s.status">{{ rotulosStatus[s.status] }}</span>
+      </article>
+    }
+  </div>
+}

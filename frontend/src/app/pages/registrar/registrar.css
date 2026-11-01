@@ -1,0 +1,59 @@
+.formulario {
+  max-width: 640px;
+}
+
+.area-foto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 160px;
+  border: 2px dashed var(--borda);
+  border-radius: var(--raio);
+  background: var(--fundo);
+  color: var(--texto-suave);
+  cursor: pointer;
+  overflow: hidden;
+  margin: 0;
+  font-weight: normal;
+}
+
+.area-foto:hover {
+  border-color: var(--azul);
+}
+
+.area-foto img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+}
+
+.botao-contorno {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.coordenadas {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+  margin: 8px 0 0;
+}
+
+.aviso {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #dff3e6;
+  color: #1d6b3f;
+}
+
+.aviso.erro {
+  background: #fbe3e3;
+  color: #9b2c2c;
+}
+
+.enviar {
+  width: 100%;
+  margin-top: 18px;
+}

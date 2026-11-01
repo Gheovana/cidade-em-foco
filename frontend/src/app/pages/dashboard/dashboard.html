@@ -1,1 +1,57 @@
-<p>dashboard works!</p>
+<h1 class="titulo-pagina">Olá!</h1>
+<p class="subtitulo-pagina">Veja o resumo das solicitações da sua cidade.</p>
+
+<section class="indicadores">
+  <div class="indicador abertas">
+    <span class="icone">⚠️</span>
+    <div>
+      <strong>{{ abertas() }}</strong>
+      <span>Abertas</span>
+    </div>
+  </div>
+
+  <div class="indicador andamento">
+    <span class="icone">🕒</span>
+    <div>
+      <strong>{{ emAndamento() }}</strong>
+      <span>Em andamento</span>
+    </div>
+  </div>
+
+  <div class="indicador resolvidas">
+    <span class="icone">✅</span>
+    <div>
+      <strong>{{ resolvidas() }}</strong>
+      <span>Resolvidas</span>
+    </div>
+  </div>
+</section>
+
+<section class="grade">
+  <div class="cartao">
+    <h2>📊 Problemas por região</h2>
+    @if (regioes().length === 0) {
+      <p class="vazio">Ainda não há ocorrências registradas.</p>
+    } @else {
+      <ul class="lista-regioes">
+        @for (r of regioes(); track r.nome) {
+          <li>
+            <span>{{ r.nome }}</span>
+            <strong>{{ r.total }}</strong>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <div class="cartao acoes">
+    <h2>⚡ Ações rápidas</h2>
+    <a class="botao" routerLink="/registrar">📷 Registrar uma ocorrência</a>
+    <a class="botao botao-contorno" routerLink="/minhas-solicitacoes">📋 Ver minhas solicitações</a>
+  </div>
+</section>
+
+<section class="cartao mapa-resumo">
+  <h2>🗺️ Mapa resumido</h2>
+  <p class="vazio">O mapa será exibido aqui na Etapa 13.</p>
+</section>

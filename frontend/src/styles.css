@@ -96,3 +96,21 @@ label {
   font-weight: 600;
   font-size: 0.95rem;
 }
+
+/* ---------- Títulos e avisos comuns às páginas ---------- */
+.titulo-pagina {
+  font-size: 1.7rem;
+  margin: 0 0 4px;
+}
+
+.subtitulo-pagina {
+  color: var(--texto-suave);
+  margin: 0 0 22px;
+}
+
+.vazio {
+  color: var(--texto-suave);
+  text-align: center;
+  padding: 24px 12px;
+  margin: 0;
+}
