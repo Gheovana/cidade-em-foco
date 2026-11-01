@@ -77,17 +77,17 @@
   white-space: nowrap;
 }
 
-.status[data-status="aberto"] {
+.status[data-status='aberto'] {
   background: #dbe8fc;
   color: #1456b8;
 }
 
-.status[data-status="em_andamento"] {
+.status[data-status='em_andamento'] {
   background: #fdf1cf;
   color: #8a6400;
 }
 
-.status[data-status="resolvido"] {
+.status[data-status='resolvido'] {
   background: #dff3e6;
   color: #1d6b3f;
 }
