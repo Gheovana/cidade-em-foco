@@ -53,4 +53,7 @@ class OcorrenciaResposta(BaseModel):
     regiao: Optional[str]
     status: str
     criado_em: datetime
-    usuario_id: int
+
+# ---------- Alteração de status (admin) ----------
+class StatusAlterar(BaseModel):
+    status: StatusOcorrencia

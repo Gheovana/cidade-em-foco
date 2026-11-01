@@ -1,3 +1,4 @@
+import { Auth } from '../../auth'
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -16,7 +17,10 @@ export class Dashboard implements OnInit {
   regioes = signal<{ nome: string; total: number }[]>([]);
   erro = signal('');
 
-  constructor(private api: Api) {}
+    constructor(
+    private api: Api,
+    public auth: Auth,
+  ) {}
 
   // ngOnInit roda uma vez, quando a página é aberta.
   ngOnInit() {

@@ -96,6 +96,25 @@
   text-decoration: none;
 }
 
+.aviso {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #dff3e6;
+  color: #1d6b3f;
+  font-size: 0.95rem;
+}
+
+.aviso.erro {
+  background: #fbe3e3;
+  color: #9b2c2c;
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 /* ---------- Celular: as duas partes ficam uma sobre a outra ---------- */
 @media (max-width: 800px) {
   .tela {

@@ -1,4 +1,4 @@
-<h1 class="titulo-pagina">Olá!</h1>
+<h1 class="titulo-pagina">Olá, {{ auth.usuario()?.nome }}!</h1>
 <p class="subtitulo-pagina">Veja o resumo das solicitações da sua cidade.</p>
 
 @if (erro()) {

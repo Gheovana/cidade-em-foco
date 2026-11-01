@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+
+import { Auth } from '../../auth';
 
 @Component({
   selector: 'app-painel',
@@ -8,10 +10,9 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
   styleUrl: './painel.css',
 })
 export class Painel {
-  constructor(private router: Router) {}
+  constructor(public auth: Auth) {}
 
-  // TEMPORÁRIO: na Etapa 10 também vai apagar a sessão do usuário.
   sair() {
-    this.router.navigate(['/login']);
+    this.auth.sair();
   }
 }

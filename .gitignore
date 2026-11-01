@@ -20,3 +20,6 @@ dist/
 # --- Sistema e editor ---
 .DS_Store
 Thumbs.db
+
+# Chave secreta da API
+backend/chave_secreta.txt

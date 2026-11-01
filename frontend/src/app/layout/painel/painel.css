@@ -124,3 +124,10 @@
     padding: 16px;
   }
 }
+
+.usuario-nome {
+  text-align: center;
+  color: #cfd9ee;
+  font-size: 0.9rem;
+  margin: -14px 0 18px;
+}

@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { guarda } from './guarda';
+
 import { Painel } from './layout/painel/painel';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Login } from './pages/login/login';
@@ -12,10 +14,13 @@ export const routes: Routes = [
   // Tela de login: sem menu lateral.
   { path: 'login', component: Login },
 
+
+  
   // Todas as telas abaixo aparecem dentro do Painel (com menu lateral).
   {
     path: '',
     component: Painel,
+    canActivate: [guarda],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'inicio' },
       { path: 'inicio', component: Dashboard },
@@ -28,4 +33,6 @@ export const routes: Routes = [
 
   // Qualquer endereço desconhecido volta para o início.
   { path: '**', redirectTo: '' },
+
+  
 ];

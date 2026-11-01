@@ -19,34 +19,55 @@
       </div>
 
       @if (aba === 'entrar') {
-        <h2>Bem-vindo(a)!</h2>
-        <p class="subtitulo">Faça login para acompanhar suas solicitações.</p>
+        <form (ngSubmit)="entrar()">
+          <h2>Bem-vindo(a)!</h2>
+          <p class="subtitulo">Faça login para acompanhar suas solicitações.</p>
 
-        <label for="email">E-mail</label>
-        <input id="email" type="email" placeholder="Seu e-mail" />
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" placeholder="Seu e-mail"
+            autocomplete="email" [(ngModel)]="email" />
 
-        <label for="senha">Senha</label>
-        <input id="senha" type="password" placeholder="Sua senha" />
+          <label for="senha">Senha</label>
+          <input id="senha" name="senha" type="password" placeholder="Sua senha"
+            autocomplete="current-password" [(ngModel)]="senha" />
 
-        <button class="botao largo" type="button" (click)="entrar()">Entrar</button>
+          @if (mensagem()) {
+            <p class="aviso" [class.erro]="erro()">{{ mensagem() }}</p>
+          }
+
+          <button class="botao largo" type="submit" [disabled]="carregando()">
+            {{ carregando() ? 'Entrando...' : 'Entrar' }}
+          </button>
+        </form>
         <p class="rodape">
           Não tem conta?
           <a href="#" (click)="mudarAba('cadastrar'); $event.preventDefault()">Cadastre-se</a>
         </p>
       } @else {
-        <h2>Criar conta</h2>
-        <p class="subtitulo">Preencha os dados para começar a usar.</p>
+        <form (ngSubmit)="cadastrar()">
+          <h2>Criar conta</h2>
+          <p class="subtitulo">Preencha os dados para começar a usar.</p>
 
-        <label for="nome">Nome</label>
-        <input id="nome" type="text" placeholder="Seu nome" />
+          <label for="nome">Nome</label>
+          <input id="nome" name="nome" type="text" placeholder="Seu nome"
+            maxlength="100" [(ngModel)]="nome" />
 
-        <label for="email-cad">E-mail</label>
-        <input id="email-cad" type="email" placeholder="Seu e-mail" />
+          <label for="email-cad">E-mail</label>
+          <input id="email-cad" name="email" type="email" placeholder="Seu e-mail"
+            autocomplete="email" [(ngModel)]="email" />
 
-        <label for="senha-cad">Senha</label>
-        <input id="senha-cad" type="password" placeholder="Mínimo de 6 caracteres" />
+          <label for="senha-cad">Senha</label>
+          <input id="senha-cad" name="senha" type="password" placeholder="Mínimo de 6 caracteres"
+            autocomplete="new-password" [(ngModel)]="senha" />
 
-        <button class="botao largo" type="button">Cadastrar</button>
+          @if (mensagem()) {
+            <p class="aviso" [class.erro]="erro()">{{ mensagem() }}</p>
+          }
+
+          <button class="botao largo" type="submit" [disabled]="carregando()">
+            {{ carregando() ? 'Cadastrando...' : 'Cadastrar' }}
+          </button>
+        </form>
         <p class="rodape">
           Já tem conta?
           <a href="#" (click)="mudarAba('entrar'); $event.preventDefault()">Entrar</a>

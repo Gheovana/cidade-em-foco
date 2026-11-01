@@ -1,8 +1,11 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app import models
 from app.database import engine
 from app.routers import ocorrencias, usuarios
+
+from app.routers import auth, ocorrencias, usuarios
 
 # Cria no banco todas as tabelas definidas em models.py (se ainda não existirem).
 models.Base.metadata.create_all(bind=engine)
@@ -14,10 +17,19 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# CORS: só aceita pedidos vindos do site Angular local.
+# Em produção, trocaríamos por o endereço real do site.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200", "http://127.0.0.1:4200"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Conecta as rotas de cada arquivo à aplicação.
 app.include_router(usuarios.router)
 app.include_router(ocorrencias.router)
-
+app.include_router(auth.router)
 
 # Rota raiz: responde quando alguém acessa o endereço principal da API.
 @app.get("/")
