@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app import models
 from app.database import engine
+from app.routers import ocorrencias, usuarios
 
 # Cria no banco todas as tabelas definidas em models.py (se ainda não existirem).
 models.Base.metadata.create_all(bind=engine)
@@ -12,6 +13,10 @@ app = FastAPI(
     description="API para registro e acompanhamento de problemas urbanos.",
     version="0.1.0",
 )
+
+# Conecta as rotas de cada arquivo à aplicação.
+app.include_router(usuarios.router)
+app.include_router(ocorrencias.router)
 
 
 # Rota raiz: responde quando alguém acessa o endereço principal da API.
