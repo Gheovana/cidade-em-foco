@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from app import models
 from app.config import PASTA_UPLOADS
 from app.database import engine
-from app.routers import auth, ocorrencias, usuarios
+from app.routers import auth, mapa, ocorrencias, usuarios
 
 # Cria no banco todas as tabelas definidas em models.py (se ainda não existirem).
 models.Base.metadata.create_all(bind=engine)
@@ -30,6 +30,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(usuarios.router)
 app.include_router(ocorrencias.router)
+app.include_router(mapa.router)
 
 # Disponibiliza as fotos em /uploads/<nome-do-arquivo>.
 app.mount("/uploads", StaticFiles(directory=PASTA_UPLOADS), name="uploads")

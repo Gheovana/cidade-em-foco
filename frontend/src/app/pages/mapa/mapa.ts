@@ -1,7 +1,16 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewChild,
+  input,
+  signal,
+} from '@angular/core';
 import * as L from 'leaflet';
 
-import { Solicitacao } from '../../models';
+import { Api } from '../../api';
+import { PontoMapa } from '../../models';
 
 @Component({
   selector: 'app-mapa',
@@ -10,11 +19,16 @@ import { Solicitacao } from '../../models';
   styleUrl: './mapa.css',
 })
 export class Mapa implements AfterViewInit, OnDestroy {
+  // Se verdadeiro, o mapa fica menor (usado no Início).
+  resumido = input(false);
+
+  @ViewChild('areaMapa', { static: true }) areaMapa!: ElementRef<HTMLDivElement>;
+
+  total = signal(0);
+  erro = signal('');
+
   private mapa?: L.Map;
   private camada = L.layerGroup();
-
-  // Vazia por enquanto. Na Etapa 13 virá da API.
-  solicitacoes: Solicitacao[] = [];
 
   private rotulos: Record<string, string> = {
     aberto: 'Aberta',
@@ -30,10 +44,14 @@ export class Mapa implements AfterViewInit, OnDestroy {
     outros: 'Outros',
   };
 
+  constructor(private api: Api) {}
+
   // O mapa só pode ser criado depois que o HTML já existe na tela.
   ngAfterViewInit() {
-    // Posição inicial genérica (Brasil). Com marcadores, o mapa ajusta o zoom sozinho.
-    this.mapa = L.map('mapa-ocorrencias').setView([-14.2, -51.9], 4);
+    this.mapa = L.map(this.areaMapa.nativeElement, {
+      // No mapa pequeno, a rodinha do mouse continua rolando a página.
+      scrollWheelZoom: !this.resumido(),
+    }).setView([-14.2, -51.9], 4);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -41,26 +59,33 @@ export class Mapa implements AfterViewInit, OnDestroy {
     }).addTo(this.mapa);
 
     this.camada.addTo(this.mapa);
-    this.desenharMarcadores();
+
+    this.api.listarPontosMapa().subscribe({
+      next: (pontos) => this.desenharMarcadores(pontos),
+      error: () => this.erro.set('Não foi possível carregar as ocorrências do mapa.'),
+    });
   }
 
   ngOnDestroy() {
     this.mapa?.remove();
+    this.mapa = undefined;
   }
 
-  // Cria um marcador colorido para cada ocorrência que tenha coordenadas.
-  desenharMarcadores() {
+  // Cria um marcador colorido para cada ocorrência.
+  private desenharMarcadores(pontos: PontoMapa[]) {
+    // Se o usuário já saiu da página, não há mais mapa para desenhar.
+    if (!this.mapa) {
+      return;
+    }
+
     this.camada.clearLayers();
-    const pontos: L.LatLngTuple[] = [];
+    this.total.set(pontos.length);
+    const limites: L.LatLngTuple[] = [];
 
-    for (const s of this.solicitacoes) {
-      if (s.latitude === null || s.longitude === null) {
-        continue;
-      }
-
+    for (const p of pontos) {
       const icone = L.divIcon({
         className: '',
-        html: `<div class="marcador marcador-${s.status}"></div>`,
+        html: `<div class="marcador marcador-${p.status}"></div>`,
         iconSize: [22, 22],
         iconAnchor: [11, 11],
       });
@@ -69,17 +94,17 @@ export class Mapa implements AfterViewInit, OnDestroy {
       // para que o que o usuário digitou nunca seja interpretado como código.
       const popup = document.createElement('div');
       const titulo = document.createElement('strong');
-      titulo.textContent = this.nomesCategoria[s.categoria] || s.titulo;
+      titulo.textContent = this.nomesCategoria[p.categoria] || p.categoria;
       const detalhes = document.createElement('div');
-      detalhes.textContent = `${this.rotulos[s.status]} · ${s.regiao || 'Local não informado'}`;
+      detalhes.textContent = `${this.rotulos[p.status] ?? p.status} · ${p.regiao || 'Local não informado'}`;
       popup.append(titulo, detalhes);
 
-      L.marker([s.latitude, s.longitude], { icon: icone }).bindPopup(popup).addTo(this.camada);
-      pontos.push([s.latitude, s.longitude]);
+      L.marker([p.latitude, p.longitude], { icon: icone }).bindPopup(popup).addTo(this.camada);
+      limites.push([p.latitude, p.longitude]);
     }
 
-    if (pontos.length > 0) {
-      this.mapa?.fitBounds(pontos, { padding: [40, 40], maxZoom: 16 });
+    if (limites.length > 0) {
+      this.mapa.fitBounds(limites, { padding: [40, 40], maxZoom: 16 });
     }
   }
 }

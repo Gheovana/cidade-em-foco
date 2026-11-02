@@ -6,6 +6,11 @@
   font-size: 0.95rem;
 }
 
+.total {
+  margin-left: auto;
+  color: var(--texto-suave);
+}
+
 .ponto {
   display: inline-block;
   width: 12px;
@@ -27,14 +32,22 @@
 }
 
 /* O mapa precisa de uma altura definida, senão não aparece. */
-#mapa-ocorrencias {
+.area-mapa {
   height: 520px;
   border-radius: var(--raio);
   z-index: 0;
 }
 
+.area-mapa.pequeno {
+  height: 300px;
+}
+
 @media (max-width: 600px) {
-  #mapa-ocorrencias {
+  .area-mapa {
     height: 380px;
+  }
+
+  .area-mapa.pequeno {
+    height: 260px;
   }
 }

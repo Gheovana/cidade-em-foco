@@ -2,7 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { OcorrenciaDetalhe, Solicitacao, StatusOcorrencia, UsuarioInfo } from './models';
+import {
+  OcorrenciaDetalhe,
+  PontoMapa,
+  Solicitacao,
+  StatusOcorrencia,
+  UsuarioInfo,
+} from './models';
 
 @Injectable({ providedIn: 'root' })
 export class Api {
@@ -32,6 +38,11 @@ export class Api {
   // Só funciona para administrador (o backend confere).
   listarUsuarios(): Observable<UsuarioInfo[]> {
     return this.http.get<UsuarioInfo[]>(`${this.base}/usuarios`);
+  }
+
+  // Pontos de toda a cidade, com dados mínimos, para o mapa.
+  listarPontosMapa(): Observable<PontoMapa[]> {
+    return this.http.get<PontoMapa[]>(`${this.base}/mapa`);
   }
 
   // Monta o endereço completo de uma foto guardada no backend.

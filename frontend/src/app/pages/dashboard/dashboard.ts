@@ -1,12 +1,13 @@
-import { Auth } from '../../auth'
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Api } from '../../api';
+import { Auth } from '../../auth';
+import { Mapa } from '../mapa/mapa';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, Mapa],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -17,7 +18,7 @@ export class Dashboard implements OnInit {
   regioes = signal<{ nome: string; total: number }[]>([]);
   erro = signal('');
 
-    constructor(
+  constructor(
     private api: Api,
     public auth: Auth,
   ) {}

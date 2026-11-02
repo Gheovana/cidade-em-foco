@@ -35,3 +35,13 @@ export interface UsuarioInfo {
   email: string;
   tipo: string;
 }
+
+// Dados mínimos para desenhar um marcador no mapa.
+export interface PontoMapa {
+  id: number;
+  categoria: string;
+  status: StatusOcorrencia;
+  regiao: string | null;
+  latitude: number;
+  longitude: number;
+}

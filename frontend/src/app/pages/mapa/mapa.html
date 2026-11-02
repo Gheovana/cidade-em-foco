@@ -1,12 +1,23 @@
-<h1 class="titulo-pagina">Mapa de Ocorrências</h1>
-<p class="subtitulo-pagina">Veja onde estão os problemas registrados na cidade.</p>
+@if (!resumido()) {
+  <h1 class="titulo-pagina">Mapa de Ocorrências</h1>
+  <p class="subtitulo-pagina">Veja onde estão os problemas registrados na cidade.</p>
+}
 
-<div class="cartao">
+@if (erro()) {
+  <p class="aviso-erro">{{ erro() }}</p>
+}
+
+<div [class.cartao]="!resumido()">
   <div class="legenda">
     <span><i class="ponto azul"></i> Aberta</span>
     <span><i class="ponto amarelo"></i> Em andamento</span>
     <span><i class="ponto verde"></i> Resolvida</span>
+    <span class="total">{{ total() }} no mapa</span>
   </div>
 
-  <div id="mapa-ocorrencias"></div>
+  <div #areaMapa class="area-mapa" [class.pequeno]="resumido()"></div>
+
+  @if (total() === 0 && !erro()) {
+    <p class="vazio">Ainda não há ocorrências com localização registrada.</p>
+  }
 </div>

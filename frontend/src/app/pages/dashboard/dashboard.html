@@ -51,11 +51,11 @@
   <div class="cartao acoes">
     <h2>⚡ Ações rápidas</h2>
     <a class="botao" routerLink="/registrar">📷 Registrar uma ocorrência</a>
-    <a class="botao botao-contorno" routerLink="/minhas-solicitacoes">📋 Ver minhas solicitações</a>
+    <a class="botao botao-contorno" routerLink="/minhas-solicitacoes">📋 Ver solicitações</a>
   </div>
 </section>
 
 <section class="cartao mapa-resumo">
   <h2>🗺️ Mapa resumido</h2>
-  <p class="vazio">O mapa será exibido aqui na Etapa 13.</p>
+  <app-mapa [resumido]="true" />
 </section>
