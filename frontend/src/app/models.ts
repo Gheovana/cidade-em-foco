@@ -45,3 +45,20 @@ export interface PontoMapa {
   latitude: number;
   longitude: number;
 }
+
+// Relatório calculado pelo backend.
+export interface Contagem {
+  nome: string;
+  total: number;
+}
+
+export interface Relatorio {
+  escopo: 'geral' | 'pessoal';
+  total: number;
+  abertas: number;
+  em_andamento: number;
+  resolvidas: number;
+  por_tipo: Contagem[];
+  por_regiao: Contagem[];
+  regioes_prioritarias: Contagem[];
+}

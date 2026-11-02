@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import {
   OcorrenciaDetalhe,
   PontoMapa,
+  Relatorio,
   Solicitacao,
   StatusOcorrencia,
   UsuarioInfo,
@@ -43,6 +44,11 @@ export class Api {
   // Pontos de toda a cidade, com dados mínimos, para o mapa.
   listarPontosMapa(): Observable<PontoMapa[]> {
     return this.http.get<PontoMapa[]>(`${this.base}/mapa`);
+  }
+
+  // Admin recebe o relatório geral; usuário comum, o das suas ocorrências.
+  obterRelatorio(): Observable<Relatorio> {
+    return this.http.get<Relatorio>(`${this.base}/relatorios`);
   }
 
   // Monta o endereço completo de uma foto guardada no backend.

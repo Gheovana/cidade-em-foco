@@ -1,6 +1,6 @@
 .totais {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -33,6 +33,7 @@
   width: 130px;
   flex-shrink: 0;
   font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
 .trilho {
@@ -49,14 +50,25 @@
   background: var(--azul);
 }
 
+.explicacao {
+  margin: 0 0 8px;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
 .prioridades {
   margin: 0;
   padding-left: 22px;
   line-height: 1.9;
 }
 
+@media (max-width: 900px) {
+  .totais {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 800px) {
-  .totais,
   .grade {
     grid-template-columns: 1fr;
   }
