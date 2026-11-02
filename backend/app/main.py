@@ -1,14 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from fastapi.staticfiles import StaticFiles
 
-from app.config import PASTA_UPLOADS
-
 from app import models
+from app.config import PASTA_UPLOADS
 from app.database import engine
-from app.routers import ocorrencias, usuarios
-
 from app.routers import auth, ocorrencias, usuarios
 
 # Cria no banco todas as tabelas definidas em models.py (se ainda não existirem).
@@ -22,7 +18,7 @@ app = FastAPI(
 )
 
 # CORS: só aceita pedidos vindos do site Angular local.
-# Em produção, trocaríamos por o endereço real do site.
+# Em produção, trocaríamos pelo endereço real do site.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:4200", "http://127.0.0.1:4200"],
@@ -31,12 +27,13 @@ app.add_middleware(
 )
 
 # Conecta as rotas de cada arquivo à aplicação.
+app.include_router(auth.router)
 app.include_router(usuarios.router)
 app.include_router(ocorrencias.router)
-app.include_router(auth.router)
 
 # Disponibiliza as fotos em /uploads/<nome-do-arquivo>.
 app.mount("/uploads", StaticFiles(directory=PASTA_UPLOADS), name="uploads")
+
 
 # Rota raiz: responde quando alguém acessa o endereço principal da API.
 @app.get("/")

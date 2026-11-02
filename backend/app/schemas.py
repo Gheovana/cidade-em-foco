@@ -28,18 +28,8 @@ class UsuarioResposta(BaseModel):
 
 
 # ---------- Ocorrências ----------
-class OcorrenciaCriar(BaseModel):
-    """Dados que o Angular envia para registrar uma ocorrência."""
-    titulo: str = Field(min_length=3, max_length=150)
-    descricao: Optional[str] = Field(default=None, max_length=2000)
-    categoria: Categoria
-    latitude: Optional[float] = Field(default=None, ge=-90, le=90)
-    longitude: Optional[float] = Field(default=None, ge=-180, le=180)
-    regiao: Optional[str] = Field(default=None, max_length=100)
-    # TEMPORÁRIO: na Etapa 10 o usuário virá do login, não do formulário.
-    usuario_id: int
-
-
+# A criação de ocorrência usa um formulário (Form) direto na rota,
+# por causa da foto. Por isso aqui só existe o schema de resposta.
 class OcorrenciaResposta(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -53,6 +43,8 @@ class OcorrenciaResposta(BaseModel):
     regiao: Optional[str]
     status: str
     criado_em: datetime
+    usuario_id: int
+
 
 # ---------- Alteração de status (admin) ----------
 class StatusAlterar(BaseModel):

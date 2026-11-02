@@ -11,7 +11,13 @@
       <small>JPG, PNG ou WEBP, até 5 MB</small>
     }
   </label>
-  <input id="foto" type="file" accept="image/jpeg,image/png,image/webp" (change)="aoEscolherFoto($event)" hidden />
+  <input
+    id="foto"
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    (change)="aoEscolherFoto($event)"
+    hidden
+  />
 
   <label for="tipo">Tipo de problema</label>
   <select id="tipo" name="tipo" [(ngModel)]="tipo">
@@ -22,12 +28,24 @@
   </select>
 
   <label for="descricao">Descrição (opcional)</label>
-  <textarea id="descricao" name="descricao" rows="4" maxlength="2000"
-    placeholder="Conte mais detalhes sobre o problema..." [(ngModel)]="descricao"></textarea>
+  <textarea
+    id="descricao"
+    name="descricao"
+    rows="4"
+    maxlength="2000"
+    placeholder="Conte mais detalhes sobre o problema..."
+    [(ngModel)]="descricao"
+  ></textarea>
 
   <label for="regiao">Localização (bairro ou endereço)</label>
-  <input id="regiao" name="regiao" type="text" maxlength="100"
-    placeholder="Ex.: Centro, Rua das Flores" [(ngModel)]="regiao" />
+  <input
+    id="regiao"
+    name="regiao"
+    type="text"
+    maxlength="100"
+    placeholder="Ex.: Centro, Rua das Flores"
+    [(ngModel)]="regiao"
+  />
 
   <button class="botao botao-contorno" type="button" (click)="usarLocalizacaoAtual()">
     📍 Usar minha localização atual
@@ -43,6 +61,7 @@
     <p class="aviso" [class.erro]="erro()">{{ mensagem() }}</p>
   }
 
-    <button class="botao enviar" type="submit" [disabled]="enviando()">
+  <button class="botao enviar" type="submit" [disabled]="enviando()">
     {{ enviando() ? 'Enviando...' : 'Enviar solicitação' }}
   </button>
+</form>
