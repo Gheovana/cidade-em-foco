@@ -7,7 +7,13 @@ from app.config import PASTA_UPLOADS, TAMANHO_MAXIMO_MB
 from app.database import obter_sessao
 from app.dependencias import apenas_admin, usuario_logado
 from app.models import HistoricoStatus, Ocorrencia, Usuario
-from app.schemas import Categoria, OcorrenciaResposta, StatusAlterar
+from app.schemas import (
+    Categoria,
+    HistoricoResposta,
+    OcorrenciaDetalhe,
+    OcorrenciaResposta,
+    StatusAlterar,
+)
 
 router = APIRouter(prefix="/ocorrencias", tags=["Ocorrências"])
 
@@ -48,6 +54,25 @@ def salvar_foto(foto: UploadFile) -> str:
     nome = f"{uuid.uuid4().hex}{extensao}"
     (PASTA_UPLOADS / nome).write_bytes(conteudo)
     return nome
+
+
+def montar_detalhe(ocorrencia: Ocorrencia, para_admin: bool) -> OcorrenciaDetalhe:
+    """Monta a resposta completa. Nome do autor e do admin só aparecem para admin."""
+    historico = [
+        HistoricoResposta(
+            status_anterior=h.status_anterior,
+            status_novo=h.status_novo,
+            alterado_em=h.alterado_em,
+            admin_nome=h.admin.nome if para_admin else None,
+        )
+        for h in sorted(ocorrencia.historico, key=lambda h: h.alterado_em)
+    ]
+    base = OcorrenciaResposta.model_validate(ocorrencia).model_dump()
+    return OcorrenciaDetalhe(
+        **base,
+        autor_nome=ocorrencia.usuario.nome if para_admin else None,
+        historico=historico,
+    )
 
 
 @router.post("", response_model=OcorrenciaResposta, status_code=201)
@@ -111,20 +136,22 @@ def listar_ocorrencias(
     return consulta.order_by(Ocorrencia.criado_em.desc()).all()
 
 
-@router.get("/{ocorrencia_id}", response_model=OcorrenciaResposta)
+@router.get("/{ocorrencia_id}", response_model=OcorrenciaDetalhe)
 def buscar_ocorrencia(
     ocorrencia_id: int,
     sessao: Session = Depends(obter_sessao),
     usuario: Usuario = Depends(usuario_logado),
 ):
     ocorrencia = sessao.get(Ocorrencia, ocorrencia_id)
+    # Se não for dono (e não for admin), responde "não encontrada":
+    # assim ninguém descobre quais ids existem.
     if not ocorrencia or (usuario.tipo != "admin" and ocorrencia.usuario_id != usuario.id):
         raise HTTPException(status_code=404, detail="Ocorrência não encontrada.")
-    return ocorrencia
+    return montar_detalhe(ocorrencia, para_admin=usuario.tipo == "admin")
 
 
 # Alterar status: SÓ administrador. Registra o histórico da mudança.
-@router.patch("/{ocorrencia_id}/status", response_model=OcorrenciaResposta)
+@router.patch("/{ocorrencia_id}/status", response_model=OcorrenciaDetalhe)
 def alterar_status(
     ocorrencia_id: int,
     dados: StatusAlterar,
@@ -147,4 +174,4 @@ def alterar_status(
         ocorrencia.status = dados.status
         sessao.commit()
         sessao.refresh(ocorrencia)
-    return ocorrencia
+    return montar_detalhe(ocorrencia, para_admin=True)

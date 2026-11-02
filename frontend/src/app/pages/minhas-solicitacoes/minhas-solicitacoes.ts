@@ -1,14 +1,16 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { Api } from '../../api';
+import { Auth } from '../../auth';
 import { Solicitacao } from '../../models';
 
 type Filtro = 'todas' | 'aberto' | 'em_andamento' | 'resolvido';
 
 @Component({
   selector: 'app-minhas-solicitacoes',
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './minhas-solicitacoes.html',
   styleUrl: './minhas-solicitacoes.css',
 })
@@ -48,7 +50,10 @@ export class MinhasSolicitacoes implements OnInit {
     return filtro === 'todas' ? todas : todas.filter((s) => s.status === filtro);
   });
 
-    constructor(public api: Api) {}
+  constructor(
+    public api: Api,
+    public auth: Auth,
+  ) {}
 
   // Roda uma vez, quando a página abre: busca as ocorrências na API.
   ngOnInit() {

@@ -28,8 +28,6 @@ class UsuarioResposta(BaseModel):
 
 
 # ---------- Ocorrências ----------
-# A criação de ocorrência usa um formulário (Form) direto na rota,
-# por causa da foto. Por isso aqui só existe o schema de resposta.
 class OcorrenciaResposta(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -44,6 +42,20 @@ class OcorrenciaResposta(BaseModel):
     status: str
     criado_em: datetime
     usuario_id: int
+
+
+class HistoricoResposta(BaseModel):
+    """Uma mudança de status. O nome do admin só é enviado ao próprio admin."""
+    status_anterior: str
+    status_novo: str
+    alterado_em: datetime
+    admin_nome: Optional[str] = None
+
+
+class OcorrenciaDetalhe(OcorrenciaResposta):
+    """Ocorrência completa: inclui autor (só para admin) e histórico."""
+    autor_nome: Optional[str] = None
+    historico: list[HistoricoResposta] = []
 
 
 # ---------- Alteração de status (admin) ----------

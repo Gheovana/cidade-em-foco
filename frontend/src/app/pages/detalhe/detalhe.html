@@ -1,0 +1,88 @@
+<a class="voltar" routerLink="/minhas-solicitacoes">← Voltar</a>
+
+@if (erro()) {
+  <p class="aviso-erro">{{ erro() }}</p>
+}
+
+@if (ocorrencia(); as o) {
+  <article class="cartao">
+    <div class="cabecalho">
+      <h1 class="titulo-pagina">{{ nomesCategoria[o.categoria] || o.titulo }}</h1>
+      <span class="status" [attr.data-status]="o.status">{{ rotulosStatus[o.status] }}</span>
+    </div>
+
+    @if (o.foto) {
+      <img class="foto" [src]="api.urlFoto(o.foto)" [alt]="o.titulo" />
+    }
+
+    <dl class="dados">
+      <dt>Descrição</dt>
+      <dd>{{ o.descricao || 'Sem descrição.' }}</dd>
+
+      <dt>Localização</dt>
+      <dd>
+        {{ o.regiao || 'Local não informado' }}
+        @if (o.latitude !== null && o.longitude !== null) {
+          <br />
+          <small>
+            {{ o.latitude.toFixed(5) }}, {{ o.longitude.toFixed(5) }} ·
+            <a
+              [href]="'https://www.openstreetmap.org/?mlat=' + o.latitude + '&mlon=' + o.longitude + '#map=17/' + o.latitude + '/' + o.longitude"
+              target="_blank"
+              rel="noopener noreferrer"
+              >ver no mapa</a
+            >
+          </small>
+        }
+      </dd>
+
+      <dt>Registrada em</dt>
+      <dd>{{ o.criado_em | date: 'dd/MM/yyyy HH:mm' }}</dd>
+
+      @if (auth.ehAdmin && o.autor_nome) {
+        <dt>Registrada por</dt>
+        <dd>{{ o.autor_nome }}</dd>
+      }
+    </dl>
+  </article>
+
+  @if (auth.ehAdmin) {
+    <section class="cartao bloco">
+      <h2>Alterar status</h2>
+      <div class="linha">
+        <select [(ngModel)]="novoStatus">
+          <option value="aberto">Aberta</option>
+          <option value="em_andamento">Em andamento</option>
+          <option value="resolvido">Resolvida</option>
+        </select>
+        <button class="botao" type="button" [disabled]="salvando()" (click)="salvarStatus()">
+          {{ salvando() ? 'Salvando...' : 'Salvar' }}
+        </button>
+      </div>
+      @if (mensagem()) {
+        <p class="info-msg">{{ mensagem() }}</p>
+      }
+    </section>
+  }
+
+  <section class="cartao bloco">
+    <h2>Histórico de status</h2>
+    @if (o.historico.length === 0) {
+      <p class="vazio">Nenhuma alteração de status até agora.</p>
+    } @else {
+      <ul class="historico">
+        @for (h of o.historico; track h.alterado_em) {
+          <li>
+            <strong>{{ rotulosStatus[h.status_anterior] }} → {{ rotulosStatus[h.status_novo] }}</strong>
+            <small>
+              {{ h.alterado_em | date: 'dd/MM/yyyy HH:mm' }}
+              @if (h.admin_nome) {
+                · por {{ h.admin_nome }}
+              }
+            </small>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+}

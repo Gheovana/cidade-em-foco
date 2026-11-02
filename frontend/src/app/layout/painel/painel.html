@@ -9,10 +9,15 @@
 
     <nav class="links">
       <a routerLink="/inicio" routerLinkActive="ativo">🏠 Início</a>
-      <a routerLink="/minhas-solicitacoes" routerLinkActive="ativo">📋 Minhas Solicitações</a>
+      <a routerLink="/minhas-solicitacoes" routerLinkActive="ativo">
+        📋 {{ auth.ehAdmin ? 'Todas as Solicitações' : 'Minhas Solicitações' }}
+      </a>
       <a routerLink="/registrar" routerLinkActive="ativo">➕ Nova Ocorrência</a>
       <a routerLink="/mapa" routerLinkActive="ativo">🗺️ Mapa de Ocorrências</a>
       <a routerLink="/relatorios" routerLinkActive="ativo">📊 Relatórios</a>
+      @if (auth.ehAdmin) {
+        <a routerLink="/usuarios" routerLinkActive="ativo">👥 Usuários</a>
+      }
     </nav>
 
     <button class="sair" type="button" (click)="sair()">↪ Sair</button>

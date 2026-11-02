@@ -1,5 +1,7 @@
-<h1 class="titulo-pagina">Minhas Solicitações</h1>
-<p class="subtitulo-pagina">Acompanhe o andamento das suas denúncias.</p>
+<h1 class="titulo-pagina">{{ auth.ehAdmin ? 'Todas as Solicitações' : 'Minhas Solicitações' }}</h1>
+<p class="subtitulo-pagina">
+  {{ auth.ehAdmin ? 'Ocorrências registradas por todos os moradores.' : 'Acompanhe o andamento das suas denúncias.' }}
+</p>
 
 @if (erro()) {
   <p class="aviso-erro">{{ erro() }}</p>
@@ -20,10 +22,10 @@
 } @else {
   <div class="lista">
     @for (s of visiveis(); track s.id) {
-      <article class="item cartao">
+      <a class="item cartao" [routerLink]="['/solicitacao', s.id]">
         <div class="foto">
           @if (s.foto) {
-                        <img [src]="api.urlFoto(s.foto)" [alt]="s.titulo" />
+            <img [src]="api.urlFoto(s.foto)" [alt]="s.titulo" />
           } @else {
             <span>📷</span>
           }
@@ -36,7 +38,7 @@
         </div>
 
         <span class="status" [attr.data-status]="s.status">{{ rotulosStatus[s.status] }}</span>
-      </article>
+      </a>
     }
   </div>
 }

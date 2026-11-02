@@ -1,0 +1,35 @@
+<h1 class="titulo-pagina">Usuários</h1>
+<p class="subtitulo-pagina">Contas cadastradas no sistema.</p>
+
+@if (erro()) {
+  <p class="aviso-erro">{{ erro() }}</p>
+}
+
+<div class="cartao tabela-caixa">
+  @if (usuarios().length === 0) {
+    <p class="vazio">Nenhum usuário encontrado.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Tipo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of usuarios(); track u.id) {
+          <tr>
+            <td>{{ u.nome }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              <span class="tipo" [class.admin]="u.tipo === 'admin'">
+                {{ u.tipo === 'admin' ? 'Administrador' : 'Comum' }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
