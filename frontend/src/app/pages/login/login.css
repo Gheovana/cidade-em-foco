@@ -15,8 +15,12 @@
   text-align: center;
 }
 
-.marca-icone {
-  font-size: 4rem;
+.marca-imagem {
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .marca h1 {
@@ -129,7 +133,9 @@
     font-size: 2rem;
   }
 
-  .marca-icone {
-    font-size: 2.5rem;
+    .marca-imagem {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
   }
 }
