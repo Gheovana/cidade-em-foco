@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="frontend/public/logo.svg" alt="Logotipo do Cidade em Foco" width="88" />
+</p>
+
 # Cidade em Foco
 
 Denúncias de problemas urbanos por uma cidade melhor!
@@ -10,8 +14,9 @@ Portal web em que moradores registram problemas da cidade (buracos, iluminação
 
 **Cidadão**
 - Cadastro e login
-- Registrar ocorrência com categoria, descrição, foto e localização (endereço, localização atual ou clique no mapa)
+- Registrar ocorrência com categoria, descrição, foto e localização (endereço ou localização atual)
 - Acompanhar as próprias solicitações, com filtros e histórico de status
+- **Editar e excluir** as próprias ocorrências, enquanto estiverem abertas
 - Mapa com as ocorrências da cidade, coloridas por status
 - Relatório pessoal
 
@@ -32,6 +37,8 @@ Portal web em que moradores registram problemas da cidade (buracos, iluminação
 - Login com token JWT e limite de tentativas (5 erros em 5 minutos)
 - Permissões conferidas no backend (usuário comum x administrador)
 - Cadastro público sempre cria usuário comum; administrador só é criado por script
+- Editar e excluir ocorrência: só o dono, e só enquanto ela estiver aberta. Depois que o administrador começa a tratar, o cidadão não pode mais alterar, e o backend recusa (erro 409)
+- Quem não é dono não consegue nem saber que a ocorrência existe (erro 404)
 - Upload de foto validado pelo conteúdo real do arquivo (JPG, PNG ou WEBP, até 5 MB)
 - Dados validados pelo backend; o mapa público não expõe descrição, foto nem autor
 
@@ -84,10 +91,12 @@ Abra http://localhost:4200. A documentação da API fica em http://127.0.0.1:800
 | `python criar_admin.py` | Cria um administrador (ou promove um usuário existente) |
 | `python trocar_admin.py` | Troca o administrador: cria o novo e remove ou rebaixa os antigos |
 | `python excluir_usuario.py` | Exclui um usuário e os dados dele (pede para digitar o e-mail para confirmar) |
+| `python apagar_ocorrencia.py` | Lista as ocorrências e apaga uma pelo número, com o histórico e a foto (pede para digitar SIM) |
 
 ## Limitações do protótipo e próximos passos
 
 - Banco SQLite local, sem implantação em servidor
 - Sem recuperação de senha por e-mail
-- Usuário ainda não edita nem exclui as próprias ocorrências
-- Ideias futuras: notificações, confirmação de problemas por outros moradores, aviso de ocorrências parecidas, protocolo, mapa de calor e exportação de relatórios
+- A localização só pode ser informada por texto ou pela localização atual do navegador (ainda não dá para clicar no mapa)
+- O administrador não edita nem exclui ocorrências de moradores pela tela (só altera o status; para apagar, usa o script)
+- Ideias futuras: protocolo por ocorrência, notificações, confirmação de problemas por outros moradores, aviso de ocorrências parecidas, mapa de calor e exportação de relatórios
