@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { Api } from '../../api';
 import { Auth } from '../../auth';
@@ -35,8 +35,14 @@ export class Detalhe implements OnInit {
   salvando = signal(false);
   novoStatus: StatusOcorrencia = 'aberto';
 
+  // Controle da exclusão (pede confirmação antes de apagar).
+  confirmandoExclusao = signal(false);
+  excluindo = signal(false);
+  erroExclusao = signal('');
+
   constructor(
     private rota: ActivatedRoute,
+    private router: Router,
     public api: Api,
     public auth: Auth,
   ) {}
@@ -57,6 +63,39 @@ export class Detalhe implements OnInit {
         this.erro.set(
           e.status === 404 ? 'Solicitação não encontrada.' : 'Não foi possível carregar a solicitação.',
         ),
+    });
+  }
+
+  // Os botões Editar/Excluir só aparecem para o dono da ocorrência e só enquanto ela
+  // está aberta. Quem decide de verdade é o backend (404 se não for dono, 409 se não estiver aberta).
+  get podeAlterar(): boolean {
+    const o = this.ocorrencia();
+    return !!o && o.usuario_id === this.auth.usuario()?.id && o.status === 'aberto';
+  }
+
+  pedirConfirmacao() {
+    this.erroExclusao.set('');
+    this.confirmandoExclusao.set(true);
+  }
+
+  cancelarExclusao() {
+    this.confirmandoExclusao.set(false);
+  }
+
+  excluir() {
+    const atual = this.ocorrencia();
+    if (!atual) {
+      return;
+    }
+    this.excluindo.set(true);
+    this.api.excluirOcorrencia(atual.id).subscribe({
+      next: () => this.router.navigate(['/minhas-solicitacoes']),
+      error: (e: HttpErrorResponse) => {
+        this.excluindo.set(false);
+        this.erroExclusao.set(
+          typeof e.error?.detail === 'string' ? e.error.detail : 'Não foi possível excluir a ocorrência.',
+        );
+      },
     });
   }
 

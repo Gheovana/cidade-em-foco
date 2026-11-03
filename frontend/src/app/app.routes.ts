@@ -26,6 +26,7 @@ export const routes: Routes = [
       { path: 'registrar', component: Registrar },
       { path: 'minhas-solicitacoes', component: MinhasSolicitacoes },
       { path: 'solicitacao/:id', component: Detalhe },
+      { path: 'solicitacao/:id/editar', component: Registrar },
       { path: 'mapa', component: Mapa },
       { path: 'relatorios', component: Relatorios },
       { path: 'usuarios', component: Usuarios, canActivate: [guardaAdmin] },

@@ -1,17 +1,20 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Api } from '../../api';
 
+// Esta mesma tela serve para DOIS casos:
+//  - /registrar                  -> cria uma ocorrência nova
+//  - /solicitacao/:id/editar     -> edita uma ocorrência existente
 @Component({
   selector: 'app-registrar',
   imports: [FormsModule],
   templateUrl: './registrar.html',
   styleUrl: './registrar.css',
 })
-export class Registrar {
+export class Registrar implements OnInit {
   tipos = [
     { valor: 'buraco', nome: 'Buraco na via' },
     { valor: 'iluminacao', nome: 'Iluminação pública' },
@@ -32,13 +35,61 @@ export class Registrar {
   erro = signal(false);
   enviando = signal(false);
 
+  // Modo edição
+  editando = signal(false);
+  carregando = signal(false);
+  private idEdicao: number | null = null;
+  private removerFotoAtual = false;
+
   private tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
   private tamanhoMaximoMB = 5;
 
   constructor(
     private api: Api,
     private router: Router,
+    private rota: ActivatedRoute,
   ) {}
+
+  ngOnInit() {
+    const parametro = this.rota.snapshot.paramMap.get('id');
+    if (parametro === null) {
+      return; // /registrar: ocorrência nova
+    }
+
+    const id = Number(parametro);
+    if (!Number.isInteger(id) || id <= 0) {
+      this.router.navigate(['/minhas-solicitacoes']);
+      return;
+    }
+
+    this.editando.set(true);
+    this.idEdicao = id;
+    this.carregando.set(true);
+
+    this.api.buscarOcorrencia(id).subscribe({
+      next: (o) => {
+        // O backend também confere, mas já avisamos aqui para não deixar editar à toa.
+        if (o.status !== 'aberto') {
+          this.router.navigate(['/solicitacao', id]);
+          return;
+        }
+        this.tipo = o.categoria;
+        this.descricao = o.descricao ?? '';
+        this.regiao = o.regiao ?? '';
+        this.latitude.set(o.latitude);
+        this.longitude.set(o.longitude);
+        this.fotoPrevia.set(o.foto ? this.api.urlFoto(o.foto) : null);
+        this.carregando.set(false);
+      },
+      error: (e: HttpErrorResponse) => {
+        this.carregando.set(false);
+        this.avisar(
+          e.status === 404 ? 'Solicitação não encontrada.' : 'Não foi possível carregar a solicitação.',
+          true,
+        );
+      },
+    });
+  }
 
   aoEscolherFoto(evento: Event) {
     const campo = evento.target as HTMLInputElement;
@@ -60,8 +111,17 @@ export class Registrar {
     }
 
     this.fotoArquivo = arquivo;
+    this.removerFotoAtual = false;
     this.fotoPrevia.set(URL.createObjectURL(arquivo));
     this.mensagem.set('');
+  }
+
+  // Tira a foto escolhida (e, na edição, pede para apagar a foto que já estava salva).
+  removerFoto(campo: HTMLInputElement) {
+    campo.value = '';
+    this.fotoArquivo = null;
+    this.fotoPrevia.set(null);
+    this.removerFotoAtual = this.editando();
   }
 
   usarLocalizacaoAtual() {
@@ -79,6 +139,14 @@ export class Registrar {
       },
       () => this.avisar('Não foi possível obter a localização. Verifique a permissão.', true),
     );
+  }
+
+  cancelar() {
+    if (this.idEdicao !== null) {
+      this.router.navigate(['/solicitacao', this.idEdicao]);
+    } else {
+      this.router.navigate(['/minhas-solicitacoes']);
+    }
   }
 
   enviar() {
@@ -106,11 +174,25 @@ export class Registrar {
     }
     if (this.fotoArquivo) {
       dados.append('foto', this.fotoArquivo);
+    } else if (this.removerFotoAtual) {
+      dados.append('remover_foto', 'true');
     }
 
     this.enviando.set(true);
-    this.api.criarOcorrencia(dados).subscribe({
-      next: () => this.router.navigate(['/minhas-solicitacoes']),
+
+    const pedido =
+      this.idEdicao !== null
+        ? this.api.editarOcorrencia(this.idEdicao, dados)
+        : this.api.criarOcorrencia(dados);
+
+    pedido.subscribe({
+      next: () => {
+        if (this.idEdicao !== null) {
+          this.router.navigate(['/solicitacao', this.idEdicao]);
+        } else {
+          this.router.navigate(['/minhas-solicitacoes']);
+        }
+      },
       error: (e: HttpErrorResponse) => {
         this.enviando.set(false);
         // Mostra a mensagem do backend quando ela for um texto simples.

@@ -104,3 +104,40 @@
   background: #dff3e6;
   color: #1d6b3f;
 }
+
+/* ---------- Editar / Excluir ---------- */
+.acoes {
+  margin-top: 12px;
+}
+
+.acoes .botao {
+  text-decoration: none;
+  text-align: center;
+}
+
+.botao-perigo {
+  background: #c0392b;
+  color: #fff;
+}
+
+.botao-perigo:hover {
+  background: #a93226;
+}
+
+.botao-claro {
+  background: #fff;
+  color: var(--texto);
+  border: 1px solid var(--borda);
+}
+
+.confirmacao {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #fbe3e3;
+  color: #7a2020;
+}
+
+.confirmacao p {
+  margin: 0;
+}

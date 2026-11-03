@@ -31,6 +31,16 @@ export class Api {
     return this.http.post<Solicitacao>(`${this.base}/ocorrencias`, dados);
   }
 
+  // Só o dono, e só enquanto a ocorrência estiver aberta (o backend confere).
+  editarOcorrencia(id: number, dados: FormData): Observable<OcorrenciaDetalhe> {
+    return this.http.put<OcorrenciaDetalhe>(`${this.base}/ocorrencias/${id}`, dados);
+  }
+
+  // Só o dono, e só enquanto a ocorrência estiver aberta (o backend confere).
+  excluirOcorrencia(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/ocorrencias/${id}`);
+  }
+
   // Só funciona para administrador (o backend confere).
   alterarStatus(id: number, status: StatusOcorrencia): Observable<OcorrenciaDetalhe> {
     return this.http.patch<OcorrenciaDetalhe>(`${this.base}/ocorrencias/${id}/status`, { status });

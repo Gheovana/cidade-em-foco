@@ -1,7 +1,13 @@
-<h1 class="titulo-pagina">Nova Ocorrência</h1>
-<p class="subtitulo-pagina">Descreva o problema e adicione uma foto.</p>
+<h1 class="titulo-pagina">{{ editando() ? 'Editar ocorrência' : 'Nova Ocorrência' }}</h1>
+<p class="subtitulo-pagina">
+  {{ editando() ? 'Altere o que for necessário e salve.' : 'Descreva o problema e adicione uma foto.' }}
+</p>
 
-<form class="cartao formulario" (ngSubmit)="enviar()">
+@if (carregando()) {
+  <p class="vazio">Carregando...</p>
+}
+
+<form class="cartao formulario" (ngSubmit)="enviar()" [hidden]="carregando()">
   <label for="foto">Foto do problema</label>
   <label class="area-foto" for="foto">
     @if (fotoPrevia()) {
@@ -12,12 +18,19 @@
     }
   </label>
   <input
+    #campoFoto
     id="foto"
     type="file"
     accept="image/jpeg,image/png,image/webp"
     (change)="aoEscolherFoto($event)"
     hidden
   />
+
+  @if (fotoPrevia()) {
+    <button class="botao-remover" type="button" (click)="removerFoto(campoFoto)">
+      Remover foto
+    </button>
+  }
 
   <label for="tipo">Tipo de problema</label>
   <select id="tipo" name="tipo" [(ngModel)]="tipo">
@@ -62,6 +75,16 @@
   }
 
   <button class="botao enviar" type="submit" [disabled]="enviando()">
-    {{ enviando() ? 'Enviando...' : 'Enviar solicitação' }}
+    @if (editando()) {
+      {{ enviando() ? 'Salvando...' : 'Salvar alterações' }}
+    } @else {
+      {{ enviando() ? 'Enviando...' : 'Enviar solicitação' }}
+    }
   </button>
+
+  @if (editando()) {
+    <button class="botao botao-contorno cancelar" type="button" [disabled]="enviando()" (click)="cancelar()">
+      Cancelar
+    </button>
+  }
 </form>

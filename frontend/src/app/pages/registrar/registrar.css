@@ -57,3 +57,21 @@
   width: 100%;
   margin-top: 18px;
 }
+
+.botao-remover {
+  display: block;
+  margin: 8px 0 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--vermelho);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.cancelar {
+  width: 100%;
+  margin-top: 10px;
+}
