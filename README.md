@@ -8,7 +8,7 @@ Denúncias de problemas urbanos por uma cidade melhor!
 
 Portal web em que moradores registram problemas da cidade (buracos, iluminação, lixo, vazamentos e outros), anexam foto, informam a localização e acompanham o andamento. Administradores veem todas as ocorrências, alteram o status e consultam relatórios.
 
-> Protótipo desenvolvido para apresentação.
+> Protótipo desenvolvido para trabalho de faculdade.
 
 ## Funcionalidades
 
