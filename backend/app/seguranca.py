@@ -7,6 +7,8 @@ from pathlib import Path
 
 import jwt
 
+from app.config import CHAVE_SECRETA_AMBIENTE
+
 # Quantas vezes o algoritmo repete o cálculo do hash da senha.
 ITERACOES = 600_000
 
@@ -14,13 +16,19 @@ ITERACOES = 600_000
 HORAS_VALIDADE = 8
 ALGORITMO = "HS256"
 
-# A chave secreta fica num arquivo local (chave_secreta.txt), criado
-# automaticamente na primeira execução. Ele está no .gitignore e NUNCA
-# deve ser publicado: quem tem a chave consegue forjar tokens.
+# A chave secreta vem, nesta ordem:
+#  1) da variável de ambiente CHAVE_SECRETA (arquivo .env ou painel da hospedagem);
+#  2) do arquivo local chave_secreta.txt, criado automaticamente na primeira execução.
+# Os dois estão no .gitignore e NUNCA devem ser publicados: quem tem a chave
+# consegue forjar tokens.
 ARQUIVO_CHAVE = Path(__file__).resolve().parent.parent / "chave_secreta.txt"
 
 
 def _obter_chave() -> str:
+    if CHAVE_SECRETA_AMBIENTE:
+        if len(CHAVE_SECRETA_AMBIENTE) < 32:
+            raise RuntimeError("A variável CHAVE_SECRETA deve ter pelo menos 32 caracteres.")
+        return CHAVE_SECRETA_AMBIENTE
     if ARQUIVO_CHAVE.exists():
         return ARQUIVO_CHAVE.read_text().strip()
     chave = secrets.token_hex(32)

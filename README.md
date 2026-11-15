@@ -84,6 +84,19 @@ ng serve
 
 Abra http://localhost:4200. A documentação da API fica em http://127.0.0.1:8000/docs.
 
+## Configuração (variáveis de ambiente)
+
+Copie `backend/.env.example` para `backend/.env` e preencha. O `.env` nunca vai para o GitHub.
+
+| Variável | Para que serve |
+|---|---|
+| `CHAVE_SECRETA` | Chave dos tokens de login (mínimo 32 caracteres). Se faltar, o sistema usa `chave_secreta.txt`. |
+| `ORIGENS_PERMITIDAS` | Sites autorizados a chamar a API (CORS), separados por vírgula. |
+
+## Documentação da API
+
+Com o backend ligado, o Swagger interativo fica em http://127.0.0.1:8000/docs (atalho: `/api-docs`).
+
 ## Scripts de administração (pasta `backend`, com o venv ativo)
 
 | Script | Para que serve |

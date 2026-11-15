@@ -67,7 +67,7 @@ export class Login {
         this.carregando.set(false);
         if (e.status === 409) {
           this.avisar('Este e-mail já está cadastrado.', true);
-        } else if (e.status === 422) {
+        } else if (e.status === 400) {
           this.avisar('Dados inválidos. Confira o e-mail e a senha.', true);
         } else {
           this.avisar('Não foi possível conectar ao servidor.', true);

@@ -48,7 +48,7 @@ def salvar_foto(foto: UploadFile) -> str:
 
     extensao = detectar_tipo_imagem(conteudo[:12])
     if extensao is None:
-        raise HTTPException(status_code=422, detail="O arquivo enviado não é uma imagem JPG, PNG ou WEBP.")
+        raise HTTPException(status_code=400, detail="O arquivo enviado não é uma imagem JPG, PNG ou WEBP.")
 
     # Nome aleatório: ignora o nome original, que poderia conter caminhos ou códigos.
     nome = f"{uuid.uuid4().hex}{extensao}"
@@ -90,11 +90,11 @@ def criar_ocorrencia(
 
     # Latitude e longitude andam juntas.
     if (latitude is None) != (longitude is None):
-        raise HTTPException(status_code=422, detail="Informe latitude e longitude juntas.")
+        raise HTTPException(status_code=400, detail="Informe latitude e longitude juntas.")
 
     # É preciso saber onde fica o problema.
     if not regiao and latitude is None:
-        raise HTTPException(status_code=422, detail="Informe a localização do problema.")
+        raise HTTPException(status_code=400, detail="Informe a localização do problema.")
 
     nome_foto = salvar_foto(foto) if foto and foto.filename else None
 
@@ -207,9 +207,9 @@ def editar_ocorrencia(
     regiao = regiao.strip() if regiao else None
     descricao = descricao.strip() if descricao else None
     if (latitude is None) != (longitude is None):
-        raise HTTPException(status_code=422, detail="Informe latitude e longitude juntas.")
+        raise HTTPException(status_code=400, detail="Informe latitude e longitude juntas.")
     if not regiao and latitude is None:
-        raise HTTPException(status_code=422, detail="Informe a localização do problema.")
+        raise HTTPException(status_code=400, detail="Informe a localização do problema.")
 
     foto_antiga = ocorrencia.foto
     nova_foto = salvar_foto(foto) if foto and foto.filename else None
