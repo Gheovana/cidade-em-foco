@@ -1,0 +1,1471 @@
+{
+  "info": {
+    "_postman_id": "e26017c8-d718-4067-94c4-4d56b359c033",
+    "name": "Cidade em Foco - API",
+    "description": "Coleção de testes da API do Cidade em Foco.\n\n**Como usar**\n1. Importe esta coleção e um dos ambientes (Local ou Nuvem).\n2. Selecione o ambiente no canto superior direito.\n3. Preencha `email_admin` e `senha_admin` (administrador criado por `criar_admin.py`) e a `senha_morador`.\n4. Rode pelo Collection Runner, na ordem.\n\nCada requisição tem testes automáticos para o caminho feliz e para as exceções.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Preparação",
+      "description": "Verifica se a API está no ar e garante que a conta de demonstração do morador existe.",
+      "item": [
+        {
+          "name": "Healthcheck",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/saude",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "saude"
+              ]
+            },
+            "description": "Usado depois do deploy para saber se a API está no ar.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devolve status ok\", function () { pm.expect(pm.response.json().status).to.eql(\"ok\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar morador de demonstração",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "Cria a conta usada nos testes. Se ela já existir, o 409 é esperado.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Morador de Demonstração\",\n  \"email\": \"{{email_morador}}\",\n  \"senha\": \"{{senha_morador}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201 criado ou 409 se já existir\", function () { pm.expect([201, 409]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Autenticação",
+      "description": "Login e identificação. O login guarda o token nas variáveis do ambiente.",
+      "item": [
+        {
+          "name": "Login do morador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Guarda o token na variável {{token}}.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email_morador}}\",\n  \"senha\": \"{{senha_morador}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Perfil comum\", function () { pm.expect(corpo.usuario.tipo).to.eql(\"comum\"); });",
+                  "pm.test(\"Não devolve senha\", function () { pm.expect(pm.response.text()).to.not.include(\"senha\"); });",
+                  "pm.environment.set(\"token\", corpo.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login do administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Guarda o token na variável {{token_admin}}.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email_admin}}\",\n  \"senha\": \"{{senha_admin}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Perfil admin\", function () { pm.expect(corpo.usuario.tipo).to.eql(\"admin\"); });",
+                  "pm.environment.set(\"token_admin\", corpo.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login com senha errada (exceção)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Não revela se o e-mail existe. Atenção: 5 erros seguidos em 5 minutos bloqueiam o login (429).",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email_morador}}\",\n  \"senha\": \"senha-errada-123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Mensagem genérica\", function () { pm.expect(pm.response.json().detail).to.eql(\"E-mail ou senha incorretos.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quem sou eu",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/eu",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "eu"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"É o morador logado\", function () { pm.expect(pm.response.json().email).to.eql(pm.environment.get(\"email_morador\").toLowerCase()); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quem sou eu sem token (exceção)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/eu",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "eu"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Usuários",
+      "description": "Cadastro é público; a lista é só do administrador.",
+      "item": [
+        {
+          "name": "Cadastrar usuário novo (tentando virar admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "O campo tipo enviado é ignorado: toda conta pública é comum.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Teste Postman\",\n  \"email\": \"postman.{{$timestamp}}@exemplo.com\",\n  \"senha\": \"123456\",\n  \"tipo\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Foi criado como comum\", function () { pm.expect(corpo.tipo).to.eql(\"comum\"); });",
+                  "pm.test(\"Não devolve senha nem hash\", function () { pm.expect(pm.response.text()).to.not.match(/senha|hash/i); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar com dados inválidos (exceção)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"A\",\n  \"email\": \"x\",\n  \"senha\": \"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 Bad Request\", function () { pm.response.to.have.status(400); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Lista os campos com erro\", function () { pm.expect(corpo.campos.length).to.eql(3); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar com e-mail repetido (exceção)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Repetido\",\n  \"email\": \"{{email_morador}}\",\n  \"senha\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"409 Conflict\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar usuários (admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"É uma lista sem senhas\", function () { pm.expect(pm.response.json()).to.be.an(\"array\"); pm.expect(pm.response.text()).to.not.include(\"senha\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar usuários como morador (exceção)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"403 Forbidden\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Ocorrências (fluxo completo)",
+      "description": "Execute na ordem (Collection Runner). Cria, consulta, edita, muda o status, testa as regras de bloqueio e exclui.",
+      "item": [
+        {
+          "name": "Criar ocorrência",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias"
+              ]
+            },
+            "description": "Formulário com texto (e foto opcional). Guarda o id em {{ocorrencia_id}}.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "categoria",
+                  "value": "buraco",
+                  "type": "text"
+                },
+                {
+                  "key": "regiao",
+                  "value": "Centro, Recife",
+                  "type": "text"
+                },
+                {
+                  "key": "descricao",
+                  "value": "[TESTE] Criada pelo Postman",
+                  "type": "text"
+                },
+                {
+                  "key": "latitude",
+                  "value": "-8.0631",
+                  "type": "text"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-34.8711",
+                  "type": "text"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true,
+                  "description": "Ative este campo e escolha uma imagem JPG, PNG ou WEBP de até 5 MB."
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Título vem da categoria\", function () { pm.expect(corpo.titulo).to.eql(\"Buraco na via\"); });",
+                  "pm.test(\"Nasce aberta\", function () { pm.expect(corpo.status).to.eql(\"aberto\"); });",
+                  "pm.environment.set(\"ocorrencia_id\", corpo.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar com categoria inválida (exceção)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "categoria",
+                  "value": "xx",
+                  "type": "text"
+                },
+                {
+                  "key": "regiao",
+                  "value": "Centro",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 Bad Request\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar sem localização (exceção)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "categoria",
+                  "value": "lixo",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 Bad Request\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar sem token (exceção)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "categoria",
+                  "value": "lixo",
+                  "type": "text"
+                },
+                {
+                  "key": "regiao",
+                  "value": "Centro",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar minhas ocorrências",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Só aparecem ocorrências do morador\", function () { const eu = pm.environment.get(\"ocorrencia_id\"); pm.expect(pm.response.json().some(o => o.id == eu)).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Detalhe da ocorrência",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Histórico começa vazio\", function () { pm.expect(corpo.historico).to.eql([]); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Detalhe de ocorrência inexistente (exceção)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "999999"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404 Not Found\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar ocorrência",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}"
+              ]
+            },
+            "description": "Só o dono, e só enquanto a ocorrência estiver aberta.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "categoria",
+                  "value": "lixo",
+                  "type": "text"
+                },
+                {
+                  "key": "regiao",
+                  "value": "Centro, Recife",
+                  "type": "text"
+                },
+                {
+                  "key": "descricao",
+                  "value": "[TESTE] Editada pelo Postman",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Dados novos\", function () { pm.expect(corpo.titulo).to.eql(\"Lixo acumulado\"); pm.expect(corpo.descricao).to.include(\"Editada\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alterar status como morador (exceção)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}",
+                "status"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"em_andamento\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"403 Forbidden\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alterar status com valor inválido (exceção)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}",
+                "status"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"inexistente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 Bad Request\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alterar status para em andamento (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}",
+                "status"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"em_andamento\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Status e histórico\", function () { pm.expect(corpo.status).to.eql(\"em_andamento\"); pm.expect(corpo.historico.length).to.eql(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Editar ocorrência em andamento (exceção)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "categoria",
+                  "value": "lixo",
+                  "type": "text"
+                },
+                {
+                  "key": "regiao",
+                  "value": "Centro, Recife",
+                  "type": "text"
+                },
+                {
+                  "key": "descricao",
+                  "value": "[TESTE] Editada pelo Postman",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"409 Conflict\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Excluir ocorrência em andamento (exceção)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"409 Conflict\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Voltar status para aberto (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}",
+                "status"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"aberto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"Histórico com 2 mudanças\", function () { pm.expect(corpo.historico.length).to.eql(2); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Excluir ocorrência",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"204 No Content\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Detalhe depois de excluir (exceção)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ocorrencias/{{ocorrencia_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocorrencias",
+                "{{ocorrencia_id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404 Not Found\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Mapa e relatórios",
+      "description": "Dados para o mapa e os relatórios.",
+      "item": [
+        {
+          "name": "Pontos do mapa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/mapa",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mapa"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Sem dados pessoais\", function () { pm.response.json().forEach(p => { pm.expect(p).to.not.have.any.keys(\"descricao\", \"foto\", \"autor_nome\", \"usuario_id\"); }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Relatório do morador (pessoal)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/relatorios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "relatorios"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Escopo pessoal\", function () { pm.expect(pm.response.json().escopo).to.eql(\"pessoal\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Relatório do administrador (geral)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/relatorios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "relatorios"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Escopo geral\", function () { pm.expect(pm.response.json().escopo).to.eql(\"geral\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

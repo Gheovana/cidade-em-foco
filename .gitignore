@@ -23,3 +23,7 @@ Thumbs.db
 
 # Chave secreta da API
 backend/chave_secreta.txt
+
+# Pastas criadas pelo Postman (espaço de trabalho local do programa)
+.postman/
+/postman/
